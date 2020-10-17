@@ -29,6 +29,7 @@ class Adjustment extends Controller
             if( $index === false){
 
                 $location_id[] = $request->all()['location_id'][$key];
+                $notkeys = $request->all()['location_id'][$key];
                 $adjustment[] = $request->all()['adjustment'][$key];
                 $productR[] = $request->all()['product'][$key];
 
@@ -235,7 +236,6 @@ class Adjustment extends Controller
 
                     $adjustments[] = count((array)$sd);
 
-                    $f = $id[$key];
                 }
 
                 $adjusted = count($adjustments);
@@ -245,7 +245,7 @@ class Adjustment extends Controller
                 $invalid = [
                     'status' => 'Failed',
                     'error_message' => 'Invalid Product',
-                    'location_id' => $f,
+                    'location_id' => $notkeys,
                     'updated_at' => now()
                 ];
 
