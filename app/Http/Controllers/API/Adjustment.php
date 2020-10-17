@@ -11,6 +11,7 @@ use App\Http\Controllers\API\Logs;
 use App\Http\Resources\AdjustmentN;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AdjustmentResponse;
+use App\Http\Resources\ReponseAdjustNotfound;
 
 class Adjustment extends Controller
 {
@@ -22,6 +23,7 @@ class Adjustment extends Controller
             $location[] = $value->id;
 
         }
+
 
         foreach ($request->product as $key => $value) {
             # code...
@@ -43,9 +45,11 @@ class Adjustment extends Controller
 
                 $dataqty = $filteredqty;
                 $dataproduct = $filteredproduct;
-
+                $sds[] = $index;
 
             } else {
+
+                $sds[] = $index;
 
                 $location_id[] = $index;
                 $dsa[] = $request->all()['location_id'][$key];
@@ -55,6 +59,14 @@ class Adjustment extends Controller
             }
             
         }
+
+        if(array_filter($sds, 'is_int') == []){
+
+            return ReponseAdjustNotfound::fails(400, "Adjustment can't processing..");
+        } 
+            
+            else {
+
 
         $filtered = Arr::where($location_id, function ($value, $key) {
             return is_string($value);
@@ -238,21 +250,22 @@ class Adjustment extends Controller
 
                 }
 
-                $adjusted = count($adjustments);
+                    $adjusted = count($adjustments);
 
-                $requested = count($dsa);
-    
-                $invalid = [
-                    'status' => 'Failed',
-                    'error_message' => 'Invalid Product',
-                    'location_id' => $notkeys,
-                    'updated_at' => now()
-                ];
+                    $requested = count($dsa);
+        
+                    $invalid = [
+                        'status' => 'Failed',
+                        'error_message' => 'Invalid Product',
+                        'location_id' => $notkeys,
+                        'updated_at' => now()
+                    ];
 
-            return AdjustmentResponse::adjustchecks(200, $AF, $requested, $adjusted, $invalid);
+                return AdjustmentResponse::adjustchecks(200, $AF, $requested, $adjusted, $invalid);
+
+            }
 
         }
-
     }
 
     protected function check_numb($vals){
